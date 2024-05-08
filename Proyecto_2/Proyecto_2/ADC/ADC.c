@@ -15,6 +15,10 @@
 uint8_t valoradc;
 
 void setupADC(void){
+	//Digital disable
+	DIDR0 = 0;
+	DIDR0 |= (1<<ADC5D) | (1<< ADC4D); //ADC5 y ADC4
+	//Setup general
 	ADMUX = 0;
 	ADMUX |= (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0); //Vcc ref | Just. Izq. | Mux ADC7
 	ADCSRA = 0;

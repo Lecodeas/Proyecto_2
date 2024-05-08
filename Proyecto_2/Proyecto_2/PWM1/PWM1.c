@@ -48,7 +48,7 @@ static void actualizar_pwm(uint16_t i, uint8_t NumServo){
 	while (listo_actualizar_pwm != 0){
 		//El valor del pulso depende del leído en ADCH
 		//El OCR1 modificado depende de NumServo
-		if (NumServo==1){
+		if (NumServo==3){
 			OCR1AH = (i & 0xFF00) >> 8;
 			OCR1AL = (i & 0x00FF);
 		}
