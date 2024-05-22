@@ -34,8 +34,21 @@ volatile uint8_t servo1 = 0; // Valor de servo 1
 volatile uint8_t servo2 = 0; // Valor de servo 2
 volatile uint8_t servo3 = 0; // Valor de servo 3
 volatile uint8_t servo4 = 0; // Valor de servo 4
+volatile uint8_t servo1_n = 135; // Valor de servo 1 en Nube
+volatile uint8_t servo2_n = 148; // Valor de servo 2 en Nube
+volatile uint8_t servo3_n = 196; // Valor de servo 3 en Nube
+volatile uint8_t servo4_n = 193; // Valor de servo 4 en Nube
+volatile uint8_t rx_leido; // Valor de rx leído
+volatile uint8_t rx_num; // Valor de rx leído
 uint8_t Estado = MANUAL; //Variable de estados
 uint8_t Direccion = 0; // Dirección de los 4 estados de Servo
+uint8_t CloudState = 1; // Bandera para identificar si estoy esperando canal o un valor desde adafruit 
+uint8_t Channel = 0; // Canal (a que enviar la señal)
+uint8_t AdaValue = 0; // Valor transmitido desde adafruit
+uint8_t u = 0; // Valor transmitido desde adafruit
+uint8_t d = 0; // Valor transmitido desde adafruit
+uint8_t c = 0; // Valor transmitido desde adafruit
+
 
 //PROTOTIPOS DE FUNCIÓN
 void setupGeneral(void);
@@ -63,7 +76,7 @@ int main(void)
 				ADMUX &= 0xF0;
 				ADMUX |= (1<<MUX2) | (1<<MUX1); //Remultiplexado ADC6
 				ADCSRA |= (1<<ADSC); //Volver a iniciar ADC
-				_delay_us(250);
+				_delay_us(500);
 				
 				//Servo 2 OC1B
 				adchleido = fetchADCH(); //Recibo el adch actual
@@ -72,7 +85,7 @@ int main(void)
 				ADMUX &= 0xF0;
 				ADMUX |= (1<<MUX2) | (1<<MUX0); //Remultiplexado ADC5
 				ADCSRA |= (1<<ADSC); //Volver a iniciar ADC
-				_delay_us(250);
+				_delay_us(500);
 				
 				//Servo 3 OC1A
 				adchleido = fetchADCH(); //Recibo el adch actual
@@ -81,7 +94,7 @@ int main(void)
 				ADMUX &= 0xF0;
 				ADMUX |=  (1<<MUX2); //Remultiplexado ADC4
 				ADCSRA |= (1<<ADSC); //Volver a iniciar ADC
-				_delay_us(250);
+				_delay_us(500);
 				
 				//Servo 4 PB0
 				adchleido = fetchADCH(); //Recibo el adch actual
@@ -90,7 +103,7 @@ int main(void)
 				ADMUX &= 0xF0;
 				ADMUX |= (1<<MUX2)|(1<<MUX1)|(1<<MUX0); //Remultiplexado ADC7
 				ADCSRA |= (1<<ADSC); //Volver a iniciar ADC
-				_delay_us(250);
+				_delay_us(500);
 				
 				break;	
 				
@@ -117,6 +130,21 @@ int main(void)
 				
 			case NUBE:
 				// Operaciones de nube
+				//Servo 1 PB3
+				actualizar_servomanual(servo1_n, 1); //Lo envía al servo 1
+				_delay_us(250);
+				
+				//Servo 2 OC1B
+				actualizar_servo(servo2_n, 2); //Lo envía al servo 2
+				_delay_us(250);
+				
+				//Servo 3 OC1A
+				actualizar_servo(servo3_n, 3); //Lo envía al servo 3
+				_delay_us(250);
+				
+				//Servo 4 PB0
+				actualizar_servomanual(servo4_n, 4); //Lo envía al servo 4
+				_delay_us(250);
 				
 				break;
 		} // SWITCH ESTADOS
@@ -130,7 +158,7 @@ void setupGeneral(void){
 	DDRD = 0; //Solo PD1 será salida
 	
 	//SALIDAS
-	DDRC = 0x0F; //Todas salidas (Digital disabled para PC4 y PC5)
+	DDRC = 0x0F; //Todas salidas (Digital disabled para PC4	y PC5)
 	DDRB = 0xFF; //Todas salidas
 	DDRD |= (1<<DDD1);		
 	
@@ -159,8 +187,6 @@ ISR(PCINT2_vect){
 				Direccion = 0;
 			}
 			if (EstadoPinD & (1<<DDD5)){ //Si PD5 está en 0, escribe la posición a la EEPROM
-				enviarChar('W');
-				enviarChar('\n');
 				// Operaciones de Eeprom
 				eeprom_write_byte((uint8_t*) (4*Direccion), servo1);
 				eeprom_write_byte((uint8_t*) ((4*Direccion)+1), servo2);
@@ -206,3 +232,49 @@ ISR(PCINT2_vect){
 			break;
 	} // SWITCH ESTADOS
 } // ISR Pines
+
+ISR(USART_RX_vect){
+	rx_leido = UDR0; //Temporal para el leído
+	switch(CloudState){
+		case 1: // El primero es un char de 1 a 4
+			Channel = rx_leido; //De 1 a 4
+			CloudState +=1;
+			break;
+			
+		case 2: //El 2do es Centenas
+			c = 100*(((uint8_t) rx_leido) - 48);
+			CloudState += 1;
+			break;
+		
+		case 3: //El 3ro es Decenas
+			d = 10*(((uint8_t) rx_leido) - 48);
+			CloudState += 1;
+			break;
+		
+		case 4: //El 4to es Unidades
+			u = ((uint8_t) rx_leido) - 48;
+			AdaValue = c+d+u; //Suma de transmisiones
+			switch (Channel)
+			{
+				case '1':
+					servo1_n = AdaValue;
+					break;
+					
+				case '2':
+					servo2_n = AdaValue;
+					break;
+				
+				case '3':
+					servo3_n = AdaValue;
+					break;
+				
+				case '4':
+					servo4_n = AdaValue;
+					break;
+				
+			}// SWITCH CANALES
+			CloudState = 1;
+			break;
+		
+	}//SWITCH ESTADOS
+}// ISR USART

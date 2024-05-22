@@ -31,10 +31,33 @@ void setupTimer2(void){
 }
 
 void actualizar_servomanual(uint8_t adchleido, uint8_t servo_a_modificar){
-	if (servo_a_modificar == 1){
-		limite_contador1 = adchleido; //Servo 1
-	}else{
-		limite_contador2 = adchleido; //Servo 4
+	switch (servo_a_modificar){
+		case 1:
+			if(adchleido<240){ 
+				if(adchleido>39){
+					limite_contador1 = adchleido; //Servo 1
+				}//LIMITE INF. SERVO 1
+				else{
+					limite_contador1 = 39;
+				}
+			}//LIMITE SUP. SERVO 1
+			else{
+				limite_contador1 = 240;
+			}
+			break;
+		case 4:
+			if(adchleido<235){
+				if(adchleido>178){
+					limite_contador2 = adchleido; //Servo 4
+				}//LIMITE INF. SERVO 4
+				else{
+					limite_contador2 = 178;
+				}
+			}//LIMITE SUP. SERVO 4
+			else{
+				limite_contador2 = 235;
+			}
+			break;
 	}
 }
 

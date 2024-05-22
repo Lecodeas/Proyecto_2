@@ -61,8 +61,46 @@ static void actualizar_pwm(uint16_t i, uint8_t NumServo){
 
 void actualizar_servo(uint8_t adchleido, uint8_t servo_a_modificar){
 	//Conversión de lectura de ADC a pulso en PWM
-	float razon = (float)adchleido/(float)255;
-	razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
-	uint16_t valorservo = (uint16_t)razon;
+	uint16_t valorservo = 0;
+	switch(servo_a_modificar){
+		case 2:
+			if (adchleido<227){
+				if (adchleido>71){
+					float razon = (float)adchleido/(float)255;
+					razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
+					valorservo = (uint16_t)razon;
+				}//LIMITE INF. SERVO 2
+				else{
+					float razon = (float)71/(float)255;
+					razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
+					valorservo = (uint16_t)razon;
+				}
+			}// LIMITE SUP. SERVO 2
+			else{
+				float razon = (float)227/(float)255;
+				razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
+				valorservo = (uint16_t)razon;
+			}
+			break;
+		case 3:
+			if (adchleido<229){
+				if (adchleido>156){
+					float razon = (float)adchleido/(float)255;
+					razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
+					valorservo = (uint16_t)razon;
+				}//LIMITE INF. SERVO 2
+				else{
+					float razon = (float)156/(float)255;
+					razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
+					valorservo = (uint16_t)razon;
+				}
+			}// LIMITE SUP. SERVO 2
+			else{
+				float razon = (float)229/(float)255;
+				razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;
+				valorservo = (uint16_t)razon;
+			}
+			break;
+	}//SWITCH SERVOS
 	actualizar_pwm(valorservo, servo_a_modificar);
 }

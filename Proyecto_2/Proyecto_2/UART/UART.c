@@ -12,7 +12,6 @@
 
 #include "UART.h"
 
-
 void setupUART(void){
 	//No necesito nada de este registro
 	UCSR0A = 0;
@@ -56,4 +55,29 @@ void enviarNum(uint8_t adchleido){
 	}
 	enviarChar((char) u+48);
 	enviarChar('\n');
+}
+
+uint8_t StrToNum(char* str){
+	//Cadena de 4 caracteres
+	uint8_t i = 0;
+	uint8_t retVal = 0;
+	uint8_t u = 0;
+	uint8_t d = 0;
+	uint8_t c = 0;
+	for(i = 0; str[i] != '\0'; i++){
+		//Mientras el caracter no sea nulo, se procesa
+		switch(i){
+			case 1: //Unidad
+				u = ((uint8_t) str[i]) - 48;
+				break;
+			case 2: //Unidad
+				d = 10*(((uint8_t) str[i]) - 48);
+				break;
+			case 3: //Unidad
+				c = 100*(((uint8_t) str[i]) - 48);
+				break;
+		}
+	}
+	retVal = u+d+c;
+	return retVal;
 }
