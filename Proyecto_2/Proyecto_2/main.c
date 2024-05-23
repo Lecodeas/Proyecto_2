@@ -6,7 +6,7 @@
  Proyecto: Proyecto 2
  Hardware: ATMEGA328P
  Creado: 29/04/2024
- Ultima modificacion: 08/05/2024
+ Ultima modificacion: 22/05/2024
     -----------------------------------------------
 */
 
@@ -255,7 +255,7 @@ ISR(USART_RX_vect){
 			u = ((uint8_t) rx_leido) - 48;
 			AdaValue = c+d+u; //Suma de transmisiones
 			switch (Channel)
-			{
+			{ //Dependiendo de a que le estoy enviando el valor, modifica el valor del servo
 				case '1':
 					servo1_n = AdaValue;
 					break;

@@ -1,7 +1,18 @@
+# /* -----------------------------------------------
+#  Universidad del Valle de Guatemala
+#  IE2023: Programacion de Microcontroladores
+#  PubSub.py
+#  Autor: Ian Anleu Rivera
+#  Proyecto: Proyecto 2
+#  Hardware: ATMEGA328P
+#  Creado: 21/04/2024
+#  Ultima modificacion: 22/05/2024
+#     -----------------------------------------------
+# */
+
 # Import standard python modules.
 import sys
 import time
-import random
 import serial
 
 

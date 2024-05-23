@@ -6,7 +6,7 @@
  Proyecto: Proyecto 2
  Hardware: ATMEGA328P
  Creado: 06/07/2024
- Ultima modificacion: 08/07/2024
+ Ultima modificacion: 22/05/2024
     -----------------------------------------------
 */
 
